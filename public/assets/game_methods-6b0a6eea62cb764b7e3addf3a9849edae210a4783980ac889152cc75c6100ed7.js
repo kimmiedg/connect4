@@ -63,7 +63,6 @@ function reinitialize(){
 function compile_row(row, index){
 
 	if (is_it_draw(moves) != false){
-		console.log("true");
 		alert("DRAW!");
 	}
 
