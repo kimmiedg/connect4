@@ -1,256 +1,43 @@
-<button onclick="start_game()" id='two_players'> 2 Players </button>
-<button id='vs_computer'> vs. Computer </button>
-<p id="p1"/>
-<p id="p2"/>
-<p id="player"/>
+<% javascript_include_tag 'game_methods' %>
+<div style="width: 100px; margin:0 auto;">
+	<button onclick="intialize_game()" id='start_game' class="myButton myButton:hover myButton:active"> START </button>
+	<p id="p1" style="color:red;"/>
+	<p id="p2" style="color:#00FF00";/>
+	<p id="player"/>
+</div>
 
-<table>
-	<tr ><button id="b1" onclick="put_move(this.id)">1</button></tr>
-	<tr id="row6">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b2" onclick="put_move(this.id)">2</button></tr>
-	<tr id="row5">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b3" onclick="put_move(this.id)">3</button></tr>
-	<tr id="row4">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b4" onclick="put_move(this.id)">4</button></tr>
-	<tr id="row3">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b5" onclick="put_move(this.id)">5</button></tr>
-	<tr id="row2">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b6" onclick="put_move(this.id)">6</button></tr>
-	<tr id="row1">
-		<td id="td1">0</td>
-		<td id="td2">0</td>
-		<td id="td3">0</td>
-		<td id="td4">0</td>
-		<td id="td5">0</td>
-		<td id="td6">0</td>
-		<td id="td7">0</td>
-	</tr>
-	<tr ><button id="b7" onclick="put_move(this.id)">7</button></tr>
-</table>
-
-<script>
-	
-	var player_on_move = "player1";
-	var pl1 = {};
-
-	function start_game(){
-		fill_player_hash(pl1);
-		var player1 = prompt("Player 1 Name");
-		var player2 = prompt("Player 2 Name");
-		if (player1 && player2 != null){
-			document.getElementById("p1").innerHTML = "Player 1 : " + player1;
-			document.getElementById("p2").innerHTML = "Player 2 : " + player2;
-			document.getElementById("player").innerHTML = "Player on Move: " + player_on_move;
-			document.getElementById("two_players").disabled="true";
-			document.getElementById("vs_computer").disabled="true";
-			// document.getElementById("table1").style.visibility = "visible"
-			// document.getElementById("1").innerHTML = "1"
-		}
-	};
-
-	function fill_player_hash(hash){
-		for(a=1; a<=6; a++){
-			var arr = [];
-			for(b=0; b<7; b++){
-				arr.push(0);
-			}
-			hash["row" + a.toString()] = arr;
-		}
-	}
-
-	//this method will tell where to plot the move. which column, td and user. Returns td
-	function get_empty_cell_and_td(column_no, player_no){
-		for(a = 1; a<=6; a++){
-			var row_name = "row"+a.toString();
-			var table_row = document.getElementById(row_name);
-			var td = table_row.getElementsByTagName("td")[column_no-1];
-			if (td.innerHTML == "0"){
-				td.innerHTML = player_no.toString();
-				save_move(row_name,(column_no-1), parseInt(player_no));
-				break; 
-			}
-		} 
-	}
-
-	function check_if_wins(val1, val2, val3, val4){
-		return ((val1 != 0) && (val1 == val2) && (val1 == val3) && (val1 == val4))
-	}
-
-	function compile_row(row, index){
-		//across
-		for(a=0; a<4; a++){
-			result = check_if_wins(row[a], row[(a+1)], row[(a+2)], row[(a+3)])
-			if(result == true){
-				alert(player_on_move + " Win!");
-			};
-		};
-
-		//down
-		for(a=1; a<=3; a++){
-			result = check_if_wins(get_column_no(a, index), 
-							 get_column_no((a+1), index), 
-							 get_column_no((a+2), index), 
-							 get_column_no((a+3), index));
-			if (result == true) {
-				alert(player_on_move + " Win!");
-			};
-		};
-
-		//diagonal up checking
-		for(a=1; a<4; a++){
-			for(b=0; b<4; b++){
-				val1 = access_hash_item("row"+a.toString(), b);
-				val2 = access_hash_item("row"+(a+1).toString(), b+1);
-				val3 = access_hash_item("row"+(a+2).toString(), b+2);
-				val4 = access_hash_item("row"+(a+3).toString(), b+3);
-				// console.log(val1 + " " + val2 + " " + val3 + " " + val4);
-				result = check_if_wins(val1, val2, val3, val4);
-				// result = check_if_wins(pl1["row"+a.toString()], pl1["row"+(a+1).toString()], pl1["row"+(a+2).toString()], pl1["row"+(a+3).toString()]);
-				if (result == true){
-					alert(player_on_move + " Win!");
-				}
-			}
-		}
-		//diagonal down checking
-		for(a=6; a>3; a--){
-			for(b=0; b<4; b++){
-				val1 = access_hash_item("row"+a.toString(), b);
-				val2 = access_hash_item("row"+(a-1).toString(), b+1);
-				val3 = access_hash_item("row"+(a-2).toString(), b+2);
-				val4 = access_hash_item("row"+(a-3).toString(), b+3);
-				result = check_if_wins(val1, val2, val3, val4);
-				if(result == true){
-					alert(player_on_move + " Win!");
-				}
-			}
-		}
-	}
-
-	function access_hash_item(row, index){
-		// console.log(row + " " + index);
-		return pl1[row][index];
-	}
-
-	function save_move(row, index, player_no){
-		pl1[row][index] = player_no;
-		compile_row(pl1[row], index);
-	}
-
-	function get_column_no(row_number, index){
-		value = pl1["row"+row_number.toString()][index];
-		return value;
-	}
-
-	function put_move(button_id){
-		var column_no = button_id.slice(-1);
-		get_empty_cell_and_td(parseInt(column_no), player_on_move.slice(-1));
-		if (player_on_move == 'player1'){
-			player_on_move = 'player2';
-		}else{
-			player_on_move = 'player1';
-		}
-	}
-
-	// function compile_row_moves(player_on_move, altered_row){
-
-	// 	// array1 = [0,0,0,0,0,0,0];
-	// 	console.log(altered_row);
-	// 	array1 = [];
-	// 	var table_row = document.getElementById(altered_row);
-	// 	for(b = 0; b<=6; b++){
-	// 		var a = table_row.getElementsByTagName('td')[b].innerText;
-	// 		console.log("a value " + a);
-	// 		array1.push(a);
-	// 		console.log("array " + b + " " + array1[b]);
-	// 	}
-
-	// 	console.log(array1);
-		// for(a = 0; a <=6; a++){
-		// 	for(b = a; a<=4)
-		// 	var td = table_row.getElementsByTagName('td')[a];
-
-		// }
-
-		// var row_values = [], new_values = [], arr = [];
-		// for(a = 0; a<6; a++){
-		// 	var table_row = document.getElementById("row"+(a+1).toString());
-		// 	for(b = 1; b<=6; b++){
-		// 		var td = table_row.getElementsByTagName("td")[b-1];
-		// 		row_values[b-1] = td.innerHTML;
-		// 	}
-		// 	console.log(row_values);
-		// 	new_values.push(row_values);
-		// }
-		// console.log("dapat" + new_values);
-		// return new_values;
-	// }
-
-	// Learn how to insert array into array. Or Array into Hash.
-
-
-
-		// if (array1 != ""){
-		// 	if ((player_on_move == 'player1') || (player_on_move=='' )){
-		// 		// player_on_move = 'player2';
-		// 		on_move = array1[array1.length-1];
-		// 		array1.pop();
-		// 		document.getElementsByTagName('button').innerHTML = "2";
-		// 		// document.getElementById(button).innerHTML = "2";
-		// 		document.getElementById(on_move).innerHTML = "1";
-		// 		table_to_patch(button, on_move, "1");
-		// 	}
-		// 	else{
-		// 		player_on_move = 'player1';
-		// 		on_move = array1[array1.length-1];
-		// 		array1.pop();
-		// 		document.getElementsByTagName('button').innerHTML = "1";
-		// 		// table_to_patch(button, on_move, "2");
-		// 		document.getElementById(on_move).innerHTML = "2";
-		// 	}
-		// }else{
-		// 	document.getElementById("b").disabled = "true";
-		// }
-	// }
-	
-
-</script>
+<div class="tableContainer-1" id="board" hidden>
+	<div class="tableContainer">
+		<table style="margin: 0 auto">
+			<tr>
+				<td><button id="b1" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b2" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b3" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b4" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b5" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b6" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+				<td><button id="b7" onclick="put_move(this.id)" class="btn_attributes">DROP</button></td>
+			</tr>
+		</table>
+		<table style="margin: 0 auto">
+			<tr id="row6">
+				<%= render "tds.html"%>
+			</tr>
+			<tr id="row5">
+				<%= render "tds.html"%>
+			</tr>
+			<tr id="row4">
+				<%= render "tds.html"%>
+			</tr>
+			<tr id="row3">
+				<%= render "tds.html"%>
+			</tr>
+			<tr id="row2">
+				<%= render "tds.html"%>
+			</tr>
+			<tr id="row1">
+				<%= render "tds.html"%>
+			</tr>
+		</table>
+	</div>
+</div>
